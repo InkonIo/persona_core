@@ -1,0 +1,36 @@
+stages:
+  - build
+  - deploy
+
+build_prod:
+  stage: build
+  image: maven:3.9.6-amazoncorretto-21
+  script:
+    - echo "Building app..."
+    - mvn clean install -Dmaven.test.skip=true
+    - echo "Finished building the app."
+  artifacts:
+    paths:
+      - target/persona-core.jar
+
+deploy_prod:
+  stage: deploy
+  image: alpine:3.11
+  environment:
+    name: prod
+  before_script:
+    - apk update && apk add openssh-client bash
+    - mkdir -p ~/.ssh
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - chmod 400 ~/.ssh
+    - touch ~/.ssh/config
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    - ssh-keyscan -H $DEPLOY_SERVER_IP >> ~/.ssh/known_hosts
+  script:
+    - echo "Deploying started..."
+    - scp ./target/persona-core.jar root@$DEPLOY_SERVER_IP:~/
+    - ssh root@$DEPLOY_SERVER_IP "bash ~/deploy.sh"
+    - echo "Finished deploying the app."
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

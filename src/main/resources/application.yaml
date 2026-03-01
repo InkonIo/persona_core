@@ -1,0 +1,64 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:persona_core_db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASS:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:25}
+      minimum-idle: ${DB_POOL_MIN_SIZE:10}
+  flyway:
+    baseline-on-migrate: true
+    enabled: true
+    schemas: public
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${JWK_URI:http://localhost:8180}/realms/${CLIENT_REALM:master}/protocol/openid-connect/certs
+  data:
+    mongodb:
+      database: persona
+      uri: mongodb://localhost:27017
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+amazon:
+  s3:
+    location: https://ad3131a0f2be454c9fd47d78588b2c62.storage.msk.3hcloud.com/${amazon.s3.bucket.name}/
+    bucket:
+      name: persona
+    access-key-id: d667d639f7c54f9d88db71159d53cf11
+    secret-access-key: f62fe6edd2844281ab3b79fc1ddaf546
+
+reindex:
+  rate: ${REINDEX_RATE:PT5M}
+
+keycloak:
+  server-url: ${JWK_URI:http://localhost:8180}
+  realm: ${CLIENT_REALM:master}
+  client-id: ${CLIENT_ID:auth}
+  client-secret: ${CLIENT_SECRET:s7IVrQwwaugfxrRls88Lyuo3vRInFSIg}
+  username: ${CLIENT_USER:admin}
+  password: ${CLIENT_PASS:admin}
+
+server:
+  compression:
+    enabled: true
+  error:
+    whitelabel:
+      enabled: false
+
+logging:
+  level:
+    org.springframework.web.client.RestTemplate: info
+
+application:
+  timezone: Asia/Aqtau
