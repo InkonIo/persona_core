@@ -1,7 +1,9 @@
 package kz.persona.core.config;
 
 import lombok.RequiredArgsConstructor;
+import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder; // Добавь этот импорт
 import org.keycloak.authorization.client.AuthzClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,14 +18,14 @@ public class KeycloakConfig {
 
     @Bean
     public Keycloak keycloak() {
-        return Keycloak.getInstance(
-                properties.getServerUrl(),
-                properties.getRealm(),
-                properties.getUsername(),
-                properties.getPassword(),
-                properties.getClientId(),
-                properties.getClientSecret()
-        );
+        // Используем Builder вместо getInstance для гибкой настройки
+        return KeycloakBuilder.builder()
+                .serverUrl(properties.getServerUrl())
+                .realm(properties.getRealm())
+                .grantType(OAuth2Constants.CLIENT_CREDENTIALS) // Переключаем на работу через Service Account
+                .clientId(properties.getClientId())
+                .clientSecret(properties.getClientSecret())
+                .build();
     }
 
     @Bean
@@ -36,5 +38,4 @@ public class KeycloakConfig {
                 null
         ));
     }
-
 }
