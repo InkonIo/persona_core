@@ -38,6 +38,9 @@ amazon:
     access-key-id: d667d639f7c54f9d88db71159d53cf11
     secret-access-key: f62fe6edd2844281ab3b79fc1ddaf546
 
+server:
+  forward-headers-strategy: framework
+
 reindex:
   rate: ${REINDEX_RATE:PT5M}
 
